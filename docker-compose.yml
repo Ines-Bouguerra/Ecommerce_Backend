@@ -1,0 +1,32 @@
+version: "3.9"
+   
+services:
+  db:
+    restart: always
+    image: mysql
+    volumes:
+      - $HOME/Desktop/MySQL-Snippets/ecommerce.sql:/ecommerce.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD = root
+      - MYSQL_DATABASE = test_db
+    ports:
+      - "3307:3306"
+  Ecommerce_Backend:
+    build: ./ #Sets the directory for docker-compose to build.
+    volumes:
+    # Copy changes made to the project to your image in real-time.
+      - .:/Ecommerce_Backend
+    # Handles the command used to run the project in the Docker container.
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./Ecommerce_Backend/.env.dev
+    environment:
+      -  DEBUG: "true"
+      -  DATABASE_NAME: ecommerce 
+      -  DATABASE_USER: root
+      -  DATABASE_PASSWORD: 
+      -  DATABASE_HOST: db
+    depends_on:
+      - db
